@@ -4,7 +4,7 @@ import cardGameConfig from "src/config/cardGameConfig";
 import useTimer from "src/hooks/useTimer";
 import Styled from "./index.style";
 import Card from "src/components/Card";
-import { generateRandomHexColor } from "src/utils/color";
+import { changeColor, generateRandomHexColor } from "src/utils/color";
 
 const BOARD_SIZE = 360;
 const INITIAL_GAME_STATE = {
@@ -13,22 +13,28 @@ const INITIAL_GAME_STATE = {
 };
 function CardGame() {
   const [gameData, setGameData] = useState(INITIAL_GAME_STATE);
-  const cardLengthPerRow = Math.round((gameData.stage + 0.5) / 2) + 1;
-  const cardSize = (BOARD_SIZE - 4 * cardLengthPerRow) / cardLengthPerRow;
-
-  const cardIds = useMemo(() => {
+  const cardProps = useMemo(() => {
+    const cardLengthPerRow = Math.round((gameData.stage + 0.5) / 2) + 1;
     const cardLength = Math.pow(cardLengthPerRow, 2);
+    const selectedCardIndex = Math.floor(Math.random() * (cardLength - 1));
+    const backgroundColor = generateRandomHexColor();
+
     return Array(cardLength)
       .fill("")
-      .map(() => uuidv4());
+      .map(() => uuidv4())
+      .map((id, index) => ({
+        key: id,
+        isAnswer: index === selectedCardIndex ? true : false,
+      }))
+      .map(({ key, isAnswer }) => ({
+        key,
+        isAnswer,
+        backgroundColor: isAnswer
+          ? changeColor(backgroundColor, Math.max(1, 50 - gameData.stage))
+          : backgroundColor,
+        size: (BOARD_SIZE - 4 * cardLengthPerRow) / cardLengthPerRow,
+      }));
   }, [gameData]);
-
-  const selectedCardIndex = useMemo(
-    () => Math.floor(Math.random() * (cardIds.length - 1)),
-    [cardIds]
-  );
-
-  const color = useMemo(() => generateRandomHexColor(), [gameData]);
 
   const { remain, resetTimer, reduceTime } = useTimer({
     time: cardGameConfig.gameLimitTime,
@@ -58,15 +64,8 @@ function CardGame() {
         스테이지: {gameData.stage}, 남은시간: {remain}, 점수: {gameData.score}{" "}
       </Styled.CardGameHeader>
       <Styled.CardBoardContainer>
-        {cardIds.map((id, index) => (
-          <Card
-            key={id}
-            stage={gameData.stage}
-            isAnswer={selectedCardIndex === index}
-            color={color}
-            size={cardSize}
-            onCardClick={onCardClick}
-          />
+        {cardProps.map((card) => (
+          <Card {...card} onCardClick={onCardClick} />
         ))}
       </Styled.CardBoardContainer>
     </Styled.CardGameContainer>

@@ -31,8 +31,6 @@ function changeColor(col: string, amt = 50) {
     colors[colorChangeIndex] += amt;
   }
 
-  console.log("colors", colors);
-
   return colors.map((color) => color.toString(16).padStart(2, "0")).join("");
 }
 
