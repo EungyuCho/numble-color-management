@@ -11,6 +11,7 @@ const INITIAL_GAME_STATE = {
   stage: 1,
   score: 0,
 };
+
 function CardGame() {
   const [gameData, setGameData] = useState(INITIAL_GAME_STATE);
   const cardProps = useMemo(() => {
@@ -18,6 +19,7 @@ function CardGame() {
     const cardLength = Math.pow(cardLengthPerRow, 2);
     const selectedCardIndex = Math.floor(Math.random() * (cardLength - 1));
     const backgroundColor = generateRandomHexColor();
+    const size = (BOARD_SIZE - 4 * cardLengthPerRow) / cardLengthPerRow;
 
     return Array(cardLength)
       .fill("")
@@ -29,10 +31,10 @@ function CardGame() {
       .map(({ key, isAnswer }) => ({
         key,
         isAnswer,
+        size,
         backgroundColor: isAnswer
           ? changeColor(backgroundColor, Math.max(1, 50 - gameData.stage))
           : backgroundColor,
-        size: (BOARD_SIZE - 4 * cardLengthPerRow) / cardLengthPerRow,
       }));
   }, [gameData]);
 
