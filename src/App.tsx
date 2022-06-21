@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-const URL = 'https://hwahae.onelink.me/8Yb2/v2hwbqed'
+const URL = 'https://github.com/EungyuCho'
 function App() {
   useEffect(() => {
     window.location.href = URL
